@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  /* This is where custom theme variables would go in v4 if needed */
+}
+
+body {
+  background-color: #020617; /* Equivalent to slate-950 */
+  color: #f8fafc;            /* Equivalent to slate-100 */
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

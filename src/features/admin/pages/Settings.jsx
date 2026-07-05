@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+// Import crisp responsive icons from lucide-react
+import {
+  Sliders,
+  Building2,
+  MapPin,
+  Clock,
+  Percent,
+  IndianRupee,
+  Utensils,
+  CloudSync,
+  Plus,
+  Save,
+  MapPinHouse
+} from 'lucide-react';
+
 export default function Settings() {
-
   const baseURL = import.meta.env.VITE_BACKEND_URL;
-
-
 
   // Global Operational Configurations State
   const [siteConfig, setSiteConfig] = useState({
@@ -104,6 +117,17 @@ export default function Settings() {
     }
   };
 
+  // Stagger entry variables
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 15 } }
+  };
+
   if (pageLoading) {
     return (
       <div className="p-8 text-center text-slate-500 font-medium text-sm">
@@ -113,114 +137,137 @@ export default function Settings() {
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto p-2">
+    <div className="space-y-8 max-w-7xl mx-auto p-2 font-sans overflow-x-hidden">
+      
       {/* Page Title Section */}
       <div>
-        <h3 className="text-xl md:text-2xl font-bold text-slate-800">Control & Configuration Panel</h3>
+        <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+          <Sliders className="w-5 h-5 text-orange-500" /> Control & Configuration Panel
+        </h3>
         <p className="text-xs md:text-sm text-slate-500">Configure global parameters, site locations, attendance rules, and default wage multipliers.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
         {/* Left 2 Columns: Core settings forms */}
-        <div className="lg:col-span-2 space-y-6">
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="lg:col-span-2 space-y-6"
+        >
           
           {/* Section 1: General Profile Rules */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 uppercase tracking-wider text-slate-700">🏢 Firm Profile & Metadata</h4>
+          <motion.div variants={itemVariants} className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h4 className="text-xs font-black text-slate-900 border-b border-slate-100 pb-2.5 uppercase tracking-wider flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-slate-400" /> Firm Profile & Metadata
+            </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Company Legal Entity Title</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Company Legal Entity Title</label>
                 <input 
                   type="text" 
-                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 font-semibold text-slate-800 bg-slate-50/50" 
+                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs sm:text-sm outline-none focus:border-orange-500 font-bold text-slate-800 bg-slate-50/50 focus:bg-white transition-all" 
                   value={siteConfig.companyName}
                   onChange={(e) => handleConfigChange('companyName', e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Central Corporate Location</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Central Corporate Location</label>
                 <input 
                   type="text" 
-                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 font-semibold text-slate-800 bg-slate-50/50" 
+                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs sm:text-sm outline-none focus:border-orange-500 font-bold text-slate-800 bg-slate-50/50 focus:bg-white transition-all" 
                   value={siteConfig.primaryLocation}
                   onChange={(e) => handleConfigChange('primaryLocation', e.target.value)}
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Section 2: Attendance & Payroll Automation Engines Rules */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 uppercase tracking-wider text-slate-700">⚙️ Attendance & Payroll Logic Rules</h4>
+          <motion.div variants={itemVariants} className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h4 className="text-xs font-black text-slate-900 border-b border-slate-100 pb-2.5 uppercase tracking-wider flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-400" /> Attendance & Payroll Logic Rules
+            </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Morning Grace Window (Mins)</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Morning Grace Window (Mins)</label>
                 <input 
                   type="number" 
-                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 font-medium text-slate-800 bg-slate-50/50" 
+                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs sm:text-sm outline-none focus:border-orange-500 font-bold text-slate-800 bg-slate-50/50 focus:bg-white transition-all" 
                   value={siteConfig.defaultGracePeriod}
                   onChange={(e) => handleConfigChange('defaultGracePeriod', e.target.value)}
                 />
-                <span className="text-[10px] text-slate-400 font-medium block mt-1">Late arrivals past this marker flag on the attendance log automatically.</span>
+                <span className="text-[10px] text-slate-400 font-medium block mt-1.5 leading-relaxed">Late arrivals past this marker flag on the attendance log automatically.</span>
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Overtime Multiplier Rate</label>
-                <select 
-                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs bg-slate-50/50 outline-none focus:border-orange-500 font-medium text-slate-800 cursor-pointer"
-                  value={siteConfig.overtimeRateMultiplier}
-                  onChange={(e) => handleConfigChange('overtimeRateMultiplier', e.target.value)}
-                >
-                  <option value="1">1.0x (Regular Hourly Rate)</option>
-                  <option value="1.25">1.25x Hourly Base</option>
-                  <option value="1.5">1.5x (Industry Standard)</option>
-                  <option value="2">2.0x Double-Time Pay</option>
-                </select>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Overtime Multiplier Rate</label>
+                <div className="relative flex items-center">
+                  <Percent className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 pointer-events-none" />
+                  <select 
+                    className="w-full border border-slate-200 p-2.5 pl-9 rounded-xl text-xs sm:text-sm bg-slate-50/50 focus:bg-white outline-none focus:border-orange-500 font-bold text-slate-700 cursor-pointer appearance-none transition-all"
+                    value={siteConfig.overtimeRateMultiplier}
+                    onChange={(e) => handleConfigChange('overtimeRateMultiplier', e.target.value)}
+                  >
+                    <option value="1">1.0x (Regular Hourly Rate)</option>
+                    <option value="1.25">1.25x Hourly Base</option>
+                    <option value="1.5">1.5x (Industry Standard)</option>
+                    <option value="2">2.0x Double-Time Pay</option>
+                  </select>
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Section 3: Global Base Wages & Allowances */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 uppercase tracking-wider text-slate-700">💰 Global Base Wages & Allowances</h4>
-            <p className="text-[11px] text-slate-400 font-medium">These defaults automatically apply when creating new workforce roster items.</p>
+          <motion.div variants={itemVariants} className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h4 className="text-xs font-black text-slate-900 border-b border-slate-100 pb-2.5 uppercase tracking-wider flex items-center gap-2">
+              <IndianRupee className="w-4 h-4 text-slate-400" /> Global Base Wages & Allowances
+            </h4>
+            <p className="text-[11px] text-slate-400 font-medium leading-relaxed">These defaults automatically apply when creating new workforce roster items.</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Default Skilled Wage (₹/Day)</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Skilled Wage (₹/Day)</label>
                 <input 
                   type="number" 
-                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 font-bold text-slate-800 bg-slate-50/50" 
+                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs sm:text-sm outline-none focus:border-orange-500 font-black text-slate-800 bg-slate-50/50 focus:bg-white transition-all" 
                   value={siteConfig.baseLabourWage}
                   onChange={(e) => handleConfigChange('baseLabourWage', e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Default Helper Wage (₹/Day)</label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Helper Wage (₹/Day)</label>
                 <input 
                   type="number" 
-                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 font-bold text-slate-800 bg-slate-50/50" 
+                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs sm:text-sm outline-none focus:border-orange-500 font-black text-slate-800 bg-slate-50/50 focus:bg-white transition-all" 
                   value={siteConfig.baseHelperWage}
                   onChange={(e) => handleConfigChange('baseHelperWage', e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Daily Mess Allowance (₹/Day)</label>
-                <input 
-                  type="number" 
-                  className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 font-bold text-slate-800 bg-slate-50/50" 
-                  value={siteConfig.dailyFoodAllowance}
-                  onChange={(e) => handleConfigChange('dailyFoodAllowance', e.target.value)}
-                />
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Daily Mess Pay (₹/Day)</label>
+                <div className="relative flex items-center">
+                  <Utensils className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 pointer-events-none" />
+                  <input 
+                    type="number" 
+                    className="w-full border border-slate-200 p-2.5 pl-9 rounded-xl text-xs sm:text-sm outline-none focus:border-orange-500 font-black text-slate-800 bg-slate-50/50 focus:bg-white transition-all" 
+                    value={siteConfig.dailyFoodAllowance}
+                    onChange={(e) => handleConfigChange('dailyFoodAllowance', e.target.value)}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Section 4: Data Integrity Systems */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-            <div>
-              <h4 className="text-xs font-bold text-slate-900">Cloud Ledger Synchronization Matrix</h4>
-              <p className="text-[11px] text-slate-400 mt-0.5">Enabling this flag commits daily operations and cashbook state logs to cloud streams continuously.</p>
+          <motion.div variants={itemVariants} className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h4 className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+                <CloudSync className="w-4 h-4 text-slate-400 shrink-0" /> Cloud Ledger Synchronization Matrix
+              </h4>
+              <p className="text-[11px] text-slate-400 mt-1 leading-normal break-words">Enabling this flag commits daily operations and cashbook state logs to cloud streams continuously.</p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer select-none">
+            <label className="relative inline-flex items-center cursor-pointer select-none shrink-0">
               <input 
                 type="checkbox" 
                 className="sr-only peer" 
@@ -229,20 +276,22 @@ export default function Settings() {
               />
               <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
             </label>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Right 1 Column: Manage Active Sites Directory List */}
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 uppercase tracking-wider text-slate-700">🏗️ Project Sites Directory</h4>
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h4 className="text-xs font-black text-slate-900 border-b border-slate-100 pb-2.5 uppercase tracking-wider flex items-center gap-2">
+              <MapPinHouse className="w-4 h-4 text-slate-400" /> Project Sites Directory
+            </h4>
             
             {/* Dynamic Site Adder Form */}
             <form onSubmit={handleAddSite} className="space-y-2">
               <input 
                 type="text" 
                 placeholder="Site Title (e.g., Apex Hub)..." 
-                className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 text-slate-800"
+                className="w-full border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 text-slate-800 bg-slate-50 focus:bg-white transition-all font-semibold"
                 value={newSiteName}
                 onChange={(e) => setNewSiteName(e.target.value)}
               />
@@ -250,33 +299,49 @@ export default function Settings() {
                 <input 
                   type="text" 
                   placeholder="Location (e.g., Surat)..." 
-                  className="flex-1 border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 text-slate-800"
+                  className="flex-1 border border-slate-200 p-2.5 rounded-xl text-xs outline-none focus:border-orange-500 text-slate-800 bg-slate-50 focus:bg-white transition-all font-semibold"
                   value={newSiteLocation}
                   onChange={(e) => setNewSiteLocation(e.target.value)}
                 />
-                <button type="submit" className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm transition-colors">+</button>
+                <motion.button 
+                  whileTap={{ scale: 0.95 }}
+                  type="submit" 
+                  className="bg-slate-950 text-white px-4 py-2 rounded-xl text-xs font-black hover:bg-slate-800 shadow-sm transition-colors flex items-center justify-center"
+                >
+                  <Plus className="w-4 h-4" />
+                </motion.button>
               </div>
             </form>
 
             {/* Sites Loop Stack from DB */}
-            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-              {activeSites.length === 0 ? (
-                <p className="text-center text-slate-400 text-xs py-4">No construction sites active.</p>
-              ) : (
-                activeSites.map((site) => (
-                  <div key={site._id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs font-medium">
-                    <div className="truncate max-w-[150px]">
-                      <p className="text-slate-900 font-bold truncate">{site.name}</p>
-                      <span className="text-[10px] font-medium text-slate-400">📍 {site.location}</span>
-                    </div>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      site.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'
-                    }`}>
-                      {site.status}
-                    </span>
-                  </div>
-                ))
-              )}
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-1 scrolling-touch">
+              <AnimatePresence initial={false}>
+                {activeSites.length === 0 ? (
+                  <p className="text-center text-slate-400 text-xs py-4 font-bold">No construction sites active.</p>
+                ) : (
+                  activeSites.map((site) => (
+                    <motion.div 
+                      key={site._id} 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs font-medium gap-3"
+                    >
+                      <div className="truncate min-w-0 flex-1">
+                        <p className="text-slate-900 font-black truncate">{site.name}</p>
+                        <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 mt-0.5 truncate">
+                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" /> {site.location}
+                        </span>
+                      </div>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                        site.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'
+                      }`}>
+                        {site.status || 'Active'}
+                      </span>
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -284,13 +349,15 @@ export default function Settings() {
 
       {/* Global Form Submission Trigger Bar */}
       <div className="flex justify-end pt-4 border-t border-slate-200">
-        <button
+        <motion.button
+          whileTap={{ scale: 0.98 }}
           onClick={handleSaveAllSettings}
           disabled={saveLoading}
-          className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-md shadow-orange-500/10 disabled:bg-slate-300"
+          className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white font-black px-6 py-3.5 rounded-xl text-xs sm:text-sm shadow-md shadow-orange-500/10 disabled:bg-slate-200 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
+          <Save className="w-4 h-4" />
           {saveLoading ? 'Saving Parameters...' : 'Commit Master Changes'}
-        </button>
+        </motion.button>
       </div>
     </div>
   );

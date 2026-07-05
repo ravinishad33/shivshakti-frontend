@@ -1,18 +1,32 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+// Import streamlined icons from lucide-react
+import {
+  Banknote,
+  Calendar,
+  Clock,
+  CircleDollarSign,
+  User,
+  Printer,
+  MessageSquare,
+  Coins,
+  X,
+  PlusCircle,
+  FileText,
+  Briefcase
+} from "lucide-react";
+
 export default function ManageSalary() {
-
   const baseURL = import.meta.env.VITE_BACKEND_URL;
-
-
 
   // Core Operational States
   const [salaryRoster, setSalaryRoster] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🆕 Advance Pop-up Modal UI States
+  // Advance Pop-up Modal UI States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [selectedWorker, setSelectedWorker] = useState(null);
@@ -88,7 +102,7 @@ export default function ManageSalary() {
                 log.workerId?._id === worker._id || log.workerId === worker._id;
               if (matchWorker && log.date?.endsWith(backendMonthSegment)) {
                 if (log.status === "Present") fullPresentCount++;
-                if (log.status === "Half-Day") fullPresentCount++;
+                if (log.status === "Half-Day") halfDayCount++;
               }
             });
           } catch (e) {
@@ -112,7 +126,6 @@ export default function ManageSalary() {
             }
           });
 
-          // Safe extraction of the site ObjectId field reference path string from the worker item configuration blueprint mapping
           const assignedSiteObjectId = worker.site?._id || worker.site || "";
 
           return {
@@ -121,7 +134,7 @@ export default function ManageSalary() {
             name: worker.name,
             role: worker.role || "Labour / Helper",
             dailyWage: worker.dailyWage || 400,
-            siteId: assignedSiteObjectId, // 🚀 Saved explicitly for the Modal submit transaction pipeline payload
+            siteId: assignedSiteObjectId, 
             totalPresentDays,
             totalHoursWorked,
             advanceTaken,
@@ -154,7 +167,7 @@ export default function ManageSalary() {
     setIsModalOpen(true);
   };
 
-  // 🆕 Submit Advance Request directly to the active Cashbook API
+  // Submit Advance Request directly to the active Cashbook API
   const handleSubmitAdvance = async (e) => {
     e.preventDefault();
     if (!advanceAmount || Number(advanceAmount) <= 0) {
@@ -168,18 +181,17 @@ export default function ManageSalary() {
     const structuredDate = `${String(new Date().getDate()).padStart(2, "0")}:${targetMonth}:${targetYear.slice(-2)}`;
 
     try {
-      // 🚀 FIXED: Injects the valid site reference configuration token parsed inside the worker profile payload
       const targetSiteId = selectedWorker.siteId || "6a44f95ee9d755ee52f9bb0e";
 
       await axios.post(
-        "${baseURL}/api/cashbook/entry",
+        `${baseURL}/api/cashbook/entry`,
         {
           type: "Debit",
           category: "Labour Advance",
           amount: Number(advanceAmount),
           description: advanceDescription.trim(),
           date: structuredDate,
-          siteId: targetSiteId, // Passed cleanly to conform directly to unified controller body key maps
+          siteId: targetSiteId, 
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -190,7 +202,7 @@ export default function ManageSalary() {
         `₹${advanceAmount} advance logged successfully for ${selectedWorker.name}! 💸`,
       );
       setIsModalOpen(false);
-      compileMonthlySalaryLedger(); // Refresh table fields instantly!
+      compileMonthlySalaryLedger(); 
     } catch (error) {
       console.error(error);
       toast.error(
@@ -305,21 +317,22 @@ export default function ManageSalary() {
   };
 
   return (
-    <div className="space-y-6 p-2 max-w-7xl mx-auto relative">
+    <div className="space-y-6 p-2 sm:p-4 max-w-7xl mx-auto relative font-sans overflow-x-hidden">
+      
       {/* Header Info Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h3 className="text-xl md:text-2xl font-bold text-slate-800">
-            Automated Salary Engine
+          <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <Banknote className="w-6 h-6 text-orange-500 animate-pulse" /> Automated Salary Engine
           </h3>
           <p className="text-xs md:text-sm text-slate-500">
-            Live payroll processing pipeline synced with dynamic attendance
-            records and advance balances.
+            Live payroll processing pipeline synced with dynamic attendance records and advance balances.
           </p>
         </div>
 
-        <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-          <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-2 flex-1 sm:flex-initial">
+            <Calendar className="w-4 h-4 text-slate-400 shrink-0 ml-1" />
             <label className="text-[10px] font-bold text-slate-400 uppercase px-1">
               Payroll Month
             </label>
@@ -331,213 +344,293 @@ export default function ManageSalary() {
             />
           </div>
 
-          <div className="bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-sm border border-slate-800">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-              Net Monthly Outflow
+          <div className="bg-slate-950 text-white px-4 py-2.5 rounded-xl shadow-md border border-slate-900 shrink-0 flex flex-col justify-center">
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Coins className="w-3 h-3 text-orange-400" /> Net Monthly Outflow
             </p>
-            <p className="text-base md:text-lg font-bold text-orange-400 mt-0.5">
+            <p className="text-base md:text-lg font-black text-orange-400 mt-0.5 leading-none">
               {formatCurrency(totalPayrollOutflow)}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Roster Accounting Matrix Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[1000px]">
-            <thead>
-              <tr className="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
-                <th className="p-4">Labour Details</th>
-                <th className="p-4">Daily Rate</th>
-                <th className="p-4">Total Present (Days)</th>
-                <th className="p-4">Hours Worked</th>
-                <th className="p-4">Gross Earned</th>
-                <th className="p-4 text-red-400">Advance Debited</th>
-                <th className="p-4 text-emerald-400">Net Payable</th>
-                <th className="p-4 text-right">Actions Pipeline</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan="8"
-                    className="p-8 text-center text-xs text-slate-400 font-medium"
-                  >
-                    Processing multi-module transactional sheets balances...
-                  </td>
-                </tr>
-              ) : salaryRoster.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="8"
-                    className="p-8 text-center text-xs text-slate-400 font-medium"
-                  >
-                    No active workforce profiles detected in ledger database
-                    files.
-                  </td>
-                </tr>
-              ) : (
-                salaryRoster.map((worker) => {
-                  const gross = calculateGrossSalary(
-                    worker.dailyWage,
-                    worker.totalPresentDays,
-                  );
-                  const net = calculateNetSalary(
-                    worker.dailyWage,
-                    worker.totalPresentDays,
-                    worker.advanceTaken,
-                  );
+      {/* Roster Accounting Layout Blocks */}
+      {loading ? (
+        <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center text-xs sm:text-sm font-bold text-slate-400">
+          Processing multi-module transactional sheets balances...
+        </div>
+      ) : salaryRoster.length === 0 ? (
+        <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center text-xs sm:text-sm font-bold text-slate-400">
+          No active workforce profiles detected in ledger database files.
+        </div>
+      ) : (
+        <>
+          {/* MOBILE RESPONSIVE CARD VIEW (< md viewport) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+            {salaryRoster.map((worker) => {
+              const gross = calculateGrossSalary(worker.dailyWage, worker.totalPresentDays);
+              const net = calculateNetSalary(worker.dailyWage, worker.totalPresentDays, worker.advanceTaken);
 
-                  return (
-                    <tr
-                      key={worker._id}
-                      className="hover:bg-slate-50/50 transition-colors"
+              return (
+                <div key={worker._id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h4 className="font-black text-slate-900 text-base truncate">{worker.name}</h4>
+                      <p className="text-[10px] font-mono text-slate-400 font-bold mt-1 flex items-center gap-1.5">
+                        <Briefcase className="w-3 h-3" /> ID: {worker.identityId} • <span className="capitalize">{worker.role}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-xs border-t border-b border-slate-100 py-3 font-semibold text-slate-600">
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Daily Rate</span>
+                      <span className="text-slate-800 font-bold font-mono">₹{worker.dailyWage}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Attendance</span>
+                      <span className="text-slate-900 font-bold">{worker.totalPresentDays} Days</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Hours Logged</span>
+                      <span className="text-indigo-600 font-mono font-bold flex items-center gap-1 mt-0.5">
+                        <Clock className="w-3.5 h-3.5 text-indigo-400" /> {worker.totalHoursWorked} Hrs
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase font-bold tracking-wider">Gross Earned</span>
+                      <span className="text-slate-800 font-bold font-mono">₹{gross.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div>
+                      <span className="text-rose-400 block text-[9px] uppercase font-bold tracking-wider">Advance Debits</span>
+                      <span className="text-rose-600 font-bold font-mono">- ₹{worker.advanceTaken.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div>
+                      <span className="text-emerald-400 block text-[9px] uppercase font-bold tracking-wider">Net Payable</span>
+                      <span className={`font-black font-mono text-sm ${net < 0 ? "text-rose-600" : "text-emerald-600"}`}>
+                        ₹{net.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-1.5 justify-end">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => openAdvanceModal(worker)}
+                      className="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold px-3 py-2 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1"
                     >
-                      <td className="p-4">
-                        <div className="font-bold text-slate-900">
-                          {worker.name}
-                        </div>
-                        <div className="text-[10px] font-mono text-slate-400 tracking-tight mt-0.5">
-                          ID: {worker.identityId} •{" "}
-                          <span className="capitalize">{worker.role}</span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-slate-600">
-                        ₹{worker.dailyWage}
-                      </td>
-                      <td className="p-4 font-semibold text-slate-900">
-                        {worker.totalPresentDays} Days
-                      </td>
-                      <td className="p-4 font-mono font-bold text-indigo-600">
-                        {worker.totalHoursWorked} Hrs
-                      </td>
-                      <td className="p-4 font-semibold text-slate-800">
-                        ₹{gross}
-                      </td>
-                      <td className="p-4 text-red-600 font-semibold">
-                        - ₹{worker.advanceTaken}
-                      </td>
-                      <td
-                        className={`p-4 font-bold text-base ${
-                          net < 0 ? "text-red-600" : "text-emerald-600"
-                        }`}
-                      >
-                        ₹{net}
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex justify-end gap-1.5">
-                          <button
-                            onClick={() => openAdvanceModal(worker)}
-                            className="bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
-                          >
-                            💸 Advance
-                          </button>
-                          <button
-                            onClick={() => handlePrintPayslip(worker)}
-                            className="bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
-                          >
-                            📄 Receipt
-                          </button>
-                          <button
-                            onClick={() => handleShareWhatsApp(worker)}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
-                          >
-                            💬 Share
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 🔮 INTERACTIVE ADVANCE LOG MODAL OVERLAY */}
-      {isModalOpen && selectedWorker && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md border border-slate-200 shadow-2xl space-y-4">
-            <div>
-              <span className="text-xl bg-orange-100 p-2 rounded-xl text-orange-600">
-                💸
-              </span>
-              <h4 className="text-lg font-black text-slate-900 tracking-tight pt-3">
-                Give Cash Advance
-              </h4>
-              <p className="text-xs text-slate-400 font-medium">
-                This transaction drops directly into the live Cashbook
-                collection as a debit.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-xs font-semibold text-slate-600 space-y-1">
-              <p>
-                👷 <span className="text-slate-400">Worker:</span>{" "}
-                <span className="text-slate-800 font-black">
-                  {selectedWorker.name}
-                </span>
-              </p>
-              <p>
-                🆔 <span className="text-slate-400">Identity Tag:</span>{" "}
-                <span className="font-mono font-bold text-slate-800">
-                  {selectedWorker.identityId}
-                </span>
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmitAdvance} className="space-y-4">
-              <div className="space-y-1">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider pl-0.5">
-                  Advance Amount (₹)
-                </label>
-                <input
-                  type="number"
-                  value={advanceAmount}
-                  onChange={(e) => setAdvanceAmount(e.target.value)}
-                  placeholder="e.g. 2000"
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 font-bold focus:border-orange-500 rounded-xl px-3 py-2.5 text-sm outline-none transition-all"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider pl-0.5">
-                  Cashbook Log Description
-                </label>
-                <textarea
-                  value={advanceDescription}
-                  onChange={(e) => setAdvanceDescription(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:border-orange-500 rounded-xl px-3 py-2 text-xs outline-none h-20 transition-all resize-none"
-                  required
-                />
-              </div>
-
-              <div className="flex gap-2 justify-end pt-2 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={modalLoading}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl transition-all shadow-md shadow-orange-500/10 disabled:opacity-50"
-                >
-                  {modalLoading
-                    ? "Processing Outflow..."
-                    : "Issue Advance Cash"}
-                </button>
-              </div>
-            </form>
+                      <PlusCircle className="w-3.5 h-3.5" /> Advance
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handlePrintPayslip(worker)}
+                      className="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold p-2 rounded-xl transition-colors shadow-sm flex items-center justify-center"
+                      title="Print Receipt"
+                    >
+                      <Printer className="w-4 h-4" />
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleShareWhatsApp(worker)}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold p-2 rounded-xl transition-colors shadow-sm flex items-center justify-center"
+                      title="Share via WhatsApp"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                    </motion.button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
+
+          {/* DESKTOP MATRIX TABLE VIEW (>= md viewports) */}
+          <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="w-full overflow-x-auto scrolling-touch">
+              <table className="w-full text-left border-collapse min-w-[1050px]">
+                <thead>
+                  <tr className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-800">
+                    <th className="p-4">Labour Operational Details</th>
+                    <th className="p-4 w-[110px]">Daily Rate</th>
+                    <th className="p-4 w-[150px]">Total Present</th>
+                    <th className="p-4 w-[130px]">Hours Logged</th>
+                    <th className="p-4 w-[130px]">Gross Earned</th>
+                    <th className="p-4 text-rose-400 w-[140px]">Advance Debits</th>
+                    <th className="p-4 text-emerald-400 w-[140px]">Net Payable</th>
+                    <th className="p-4 text-right w-[240px]">Actions Pipeline</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-xs sm:text-sm font-medium text-slate-700">
+                  {salaryRoster.map((worker) => {
+                    const gross = calculateGrossSalary(worker.dailyWage, worker.totalPresentDays);
+                    const net = calculateNetSalary(worker.dailyWage, worker.totalPresentDays, worker.advanceTaken);
+
+                    return (
+                      <tr key={worker._id} className="hover:bg-slate-50/60 transition-colors">
+                        <td className="p-4">
+                          <div className="font-black text-slate-900">{worker.name}</div>
+                          <div className="text-[10px] font-mono text-slate-400 tracking-tight font-bold mt-0.5">
+                            ID: {worker.identityId} • <span className="capitalize">{worker.role}</span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-slate-600 font-bold font-mono">
+                          ₹{worker.dailyWage}
+                        </td>
+                        <td className="p-4 font-bold text-slate-900">
+                          {worker.totalPresentDays} Days
+                        </td>
+                        <td className="p-4 font-mono font-bold text-indigo-600">
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-indigo-400" /> {worker.totalHoursWorked} Hrs
+                          </span>
+                        </td>
+                        <td className="p-4 font-bold text-slate-800 font-mono">
+                          ₹{gross.toLocaleString('en-IN')}
+                        </td>
+                        <td className="p-4 text-rose-600 font-black font-mono">
+                          - ₹{worker.advanceTaken.toLocaleString('en-IN')}
+                        </td>
+                        <td className={`p-4 font-black text-base font-mono ${net < 0 ? "text-rose-600" : "text-emerald-600"}`}>
+                          ₹{net.toLocaleString('en-IN')}
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="flex justify-end gap-1.5">
+                            <button
+                              onClick={() => openAdvanceModal(worker)}
+                              className="bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition-colors shadow-sm flex items-center gap-1"
+                            >
+                              <PlusCircle className="w-3.5 h-3.5" /> Advance
+                            </button>
+                            <button
+                              onClick={() => handlePrintPayslip(worker)}
+                              className="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition-colors shadow-sm flex items-center gap-1"
+                            >
+                              <Printer className="w-3.5 h-3.5" /> Receipt
+                            </button>
+                            <button
+                              onClick={() => handleShareWhatsApp(worker)}
+                              className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition-colors shadow-sm flex items-center gap-1"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" /> Share
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
+
+      {/* INTERACTIVE ADVANCE LOG MODAL OVERLAY */}
+      <AnimatePresence>
+        {isModalOpen && selectedWorker && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            
+            {/* Modal Backdrop overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"
+            />
+            
+            {/* Modal Box Container */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: 'spring', duration: 0.4 }}
+              className="bg-white rounded-3xl p-6 w-full max-w-md border border-slate-200 shadow-2xl space-y-4 relative z-10"
+            >
+              <button 
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 border border-slate-100 bg-slate-50 hover:bg-slate-100 rounded-xl h-8 w-8 flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-start gap-3">
+                <div className="bg-orange-100 p-2.5 rounded-xl text-orange-600 shrink-0">
+                  <CircleDollarSign className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-black text-slate-900 tracking-tight">
+                    Issue Cash Advance
+                  </h4>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">
+                    This debit transaction will log directly into the dynamic Cashbook pipeline database.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-xs font-bold text-slate-600 space-y-1.5">
+                <div className="flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-slate-400" /> 
+                  <span>Worker Target:</span> 
+                  <span className="text-slate-900 font-black ml-auto">{selectedWorker.name}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-slate-400" /> 
+                  <span>Identity Roster Tag:</span> 
+                  <span className="font-mono font-bold text-slate-900 ml-auto">{selectedWorker.identityId}</span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitAdvance} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider pl-0.5">
+                    Advance Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={advanceAmount}
+                    onChange={(e) => setAdvanceAmount(e.target.value)}
+                    placeholder="Enter cash payout amount (e.g., 2000)"
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 font-bold focus:border-orange-500 rounded-xl px-3.5 py-3 text-xs sm:text-sm outline-none focus:bg-white transition-all"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider pl-0.5">
+                    Cashbook Log Description
+                  </label>
+                  <textarea
+                    value={advanceDescription}
+                    onChange={(e) => setAdvanceDescription(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:border-orange-500 rounded-xl px-3.5 py-2.5 text-xs outline-none h-20 transition-all focus:bg-white resize-none"
+                    required
+                  />
+                </div>
+
+                <div className="flex gap-2 justify-end pt-2 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={modalLoading}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl transition-all shadow-md shadow-orange-500/10 disabled:opacity-50"
+                  >
+                    {modalLoading ? "Processing Outflow..." : "Issue Advance Cash"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

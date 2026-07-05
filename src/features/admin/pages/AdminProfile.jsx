@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+// Import sleek vector icons from lucide-react
+import {
+  User,
+  ShieldCheck,
+  Phone,
+  Fingerprint,
+  CalendarDays,
+  FileText,
+  KeyRound,
+  Mail,
+  UserPen ,
+  LockKeyhole,
+  LockOpen
+} from 'lucide-react';
+
 export default function AdminProfile() {
   const baseURL = import.meta.env.VITE_BACKEND_URL;
-
 
   // Core Profile Data matching your exact User Schema parameters
   const [profile, setProfile] = useState({
@@ -73,8 +88,6 @@ export default function AdminProfile() {
     fetchAdminProfileDetails();
   }, []);
 
-
-
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setActionLoading(true);
@@ -92,7 +105,7 @@ export default function AdminProfile() {
       success: () => {
         setIsEditing(false);
         setActionLoading(false);
-        return 'Profile details saved successfully! 👤';
+        return 'Profile details saved successfully!';
       },
       error: (err) => {
         setActionLoading(false);
@@ -100,9 +113,6 @@ export default function AdminProfile() {
       }
     });
   };
-
-
-
 
   // METHOD 1: Traditional Password Rotation
   const handlePasswordSubmit = async (e) => {
@@ -127,7 +137,7 @@ export default function AdminProfile() {
       success: () => {
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         setActionLoading(false);
-        return 'Password changed successfully! 🔐';
+        return 'Password changed successfully!';
       },
       error: (err) => {
         setActionLoading(false);
@@ -156,7 +166,7 @@ export default function AdminProfile() {
       success: () => {
         setOtpSent(true);
         setActionLoading(false);
-        return 'OTP code sent to your email box! 📧';
+        return 'OTP code sent to your email box!';
       },
       error: (err) => {
         setActionLoading(false);
@@ -189,7 +199,7 @@ export default function AdminProfile() {
         setOtpData({ emailInput: '', otpCode: '', newPassword: '', confirmPassword: '' });
         setOtpSent(false);
         setActionLoading(false);
-        return 'Password updated securely via OTP! 🔓';
+        return 'Password updated securely via OTP!';
       },
       error: (err) => {
         setActionLoading(false);
@@ -207,38 +217,38 @@ export default function AdminProfile() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto p-2">
+    <div className="space-y-8 max-w-6xl mx-auto p-2 overflow-x-hidden">
+      
       {/* Profile Page Header */}
       <div>
-        <h3 className="text-xl md:text-2xl font-bold text-slate-800">Admin Account Profile</h3>
+        <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Admin Account Profile</h3>
         <p className="text-xs md:text-sm text-slate-500">View your database file parameters, security credentials, and identity documents cleanly.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* LEFT COLUMN: VISUAL PROFILE CARD WITH ALL MODEL SPECIFICATIONS */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-between gap-6 text-center">
+        {/* LEFT COLUMN: VISUAL PROFILE CARD */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-between gap-6 text-center h-fit">
           <div className="space-y-4 flex flex-col items-center w-full">
-            {/* Display profile picture if available, fallback to gear emoji */}
             {profile.profilePhoto ? (
               <img 
                 src={`${baseURL}/${profile.profilePhoto}`} 
                 alt="Admin Profile" 
-                className="w-24 h-24 rounded-full object-cover border-2 border-slate-200 shadow-md"
+                className="w-24 h-24 rounded-full object-cover border-2 border-slate-100 shadow-md animate-fadeIn"
               />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-slate-900 text-white flex items-center justify-center text-2xl font-black shadow-inner">
-                🛠️
+              <div className="w-20 h-20 rounded-full bg-slate-950 text-slate-300 flex items-center justify-center border border-slate-800 shadow-inner">
+                <User className="w-8 h-8" />
               </div>
             )}
 
-            <div className="space-y-1">
-              <h4 className="text-lg font-bold text-slate-900">{profile.name}</h4>
+            <div className="space-y-1.5">
+              <h4 className="text-lg font-black text-slate-900 tracking-tight">{profile.name}</h4>
               <div className="flex gap-1.5 justify-center items-center">
-                <span className="inline-block text-[9px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  System {profile.role}
+                <span className="inline-flex items-center gap-1 text-[9px] bg-slate-900 text-white font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  <ShieldCheck className="w-2.5 h-2.5" /> {profile.role}
                 </span>
-                <span className={`inline-block text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                <span className={`inline-block text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
                   profile.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                 }`}>
                   {profile.status}
@@ -248,52 +258,54 @@ export default function AdminProfile() {
           </div>
           
           {/* Detailed Schema Fields Display */}
-          <div className="w-full pt-4 border-t border-slate-100 text-left space-y-3 text-xs text-slate-600">
-            <div className="flex justify-between">
-              <span className="text-slate-400 font-medium">Unique Login ID:</span>
-              <span className="font-mono font-bold text-slate-800">{profile.identityId}</span>
+          <div className="w-full pt-4 border-t border-slate-100 text-left space-y-3.5 text-xs text-slate-600">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400 font-semibold flex items-center gap-1.5"><Fingerprint className="w-3.5 h-3.5 text-slate-400" /> Unique Login ID:</span>
+              <span className="font-mono font-bold text-slate-900 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded text-[11px]">{profile.identityId}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400 font-medium">Mobile Contact:</span>
-              <span className="font-bold text-slate-800">{profile.mobile}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400 font-semibold flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400" /> Mobile Contact:</span>
+              <span className="font-bold text-slate-900">{profile.mobile}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400 font-medium">Aadhaar Number:</span>
-              <span className="font-mono font-bold text-slate-800">{profile.adharNumber || 'Not Uploaded'}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400 font-semibold flex items-center gap-1.5"><FileText className="w-3.5 h-3.5 text-slate-400" /> Identity ID Number:</span>
+              <span className="font-mono font-bold text-slate-900">{profile.adharNumber || 'Not Uploaded'}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400 font-medium">Onboarding Date:</span>
-              <span className="font-mono font-bold text-slate-800">{formatDisplayDate(profile.createdAt)}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400 font-semibold flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5 text-slate-400" /> Onboarding Date:</span>
+              <span className="font-mono font-bold text-slate-900">{formatDisplayDate(profile.createdAt)}</span>
             </div>
 
             {/* View document link button */}
             {profile.aadhaarPhoto && (
-              <div className="pt-2">
+              <div className="pt-1">
                 <a 
                   href={`${baseURL}/${profile.aadhaarPhoto}`} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="w-full inline-block text-center bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-2 rounded-xl text-[11px] transition-colors"
+                  className="w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-[11px] transition-colors"
                 >
-                  📄 View Aadhaar Card Document File
+                  <FileText className="w-3.5 h-3.5 text-slate-500" /> View Identity Document File
                 </a>
               </div>
             )}
           </div>
         </div>
 
-        {/* RIGHT COLUMNS: EDIT PROFILE AND SECURITY ACTION BOARDS */}
+        {/* RIGHT COLUMNS: CONFIGURATION TILES */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* Block A: General Info Editor (Name & Mobile) */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          {/* Block A: General Info Editor */}
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex justify-between items-center">
-              <h5 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Personal Details Configuration</h5>
+              <h5 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <UserPen  className="w-4 h-4 text-slate-400" /> Personal Details Configuration
+              </h5>
               {!isEditing && (
                 <button
                   type="button"
                   onClick={() => setIsEditing(true)}
-                  className="text-xs text-indigo-600 hover:text-indigo-800 font-bold underline"
+                  className="text-xs text-orange-500 hover:text-orange-600 font-bold underline transition-colors"
                 >
                   Edit Information
                 </button>
@@ -303,209 +315,237 @@ export default function AdminProfile() {
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Full Display Name</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Full Display Name</label>
                   <input
                     type="text"
                     disabled={!isEditing}
                     value={profile.name}
                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-75"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-orange-500 disabled:cursor-not-allowed disabled:opacity-75 focus:bg-white transition-all"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Mobile Number Connection</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Mobile Number Connection</label>
                   <input
                     type="text"
                     disabled={!isEditing}
                     value={profile.mobile}
                     onChange={(e) => setProfile({ ...profile, mobile: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-75"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-orange-500 disabled:cursor-not-allowed disabled:opacity-75 focus:bg-white transition-all"
                     required
                   />
                 </div>
               </div>
 
               {isEditing && (
-                <div className="flex justify-end gap-2 pt-2">
+                <motion.div 
+                  initial={{ opacity: 0, y: 5 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  className="flex justify-end gap-2 pt-1"
+                >
                   <button
                     type="button"
                     onClick={() => { setIsEditing(false); fetchAdminProfileDetails(); }}
-                    className="px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl"
+                    className="px-4 py-2.5 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={actionLoading}
-                    className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-colors"
+                    className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-colors shadow-sm"
                   >
                     Save Information
                   </button>
-                </div>
+                </motion.div>
               )}
             </form>
           </div>
 
           {/* Block B: Smart Security Dual-Method Password Engine */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h5 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Security Access & Password Change Pipeline</h5>
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h5 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <LockKeyhole className="w-4 h-4 text-slate-400" /> Security Access Pipeline
+            </h5>
             
             {/* Methods Selection Tabs */}
-            <div className="flex border-b border-slate-100 text-xs font-bold">
+            <div className="flex border-b border-slate-100 text-[11px] sm:text-xs font-bold">
               <button 
                 type="button"
                 onClick={() => setActiveTab('password')}
-                className={`py-2 px-4 border-b-2 transition-all ${activeTab === 'password' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                className={`py-2 px-3 sm:px-4 border-b-2 transition-all flex items-center gap-1.5 ${activeTab === 'password' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
               >
-                🔄 Method 1: Use Current Password
+                <KeyRound className="w-3.5 h-3.5" /> Passphrase Rotation
               </button>
               <button 
                 type="button"
                 onClick={() => setActiveTab('otp')}
-                className={`py-2 px-4 border-b-2 transition-all ${activeTab === 'otp' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                className={`py-2 px-3 sm:px-4 border-b-2 transition-all flex items-center gap-1.5 ${activeTab === 'otp' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
               >
-                📧 Method 2: Use Email OTP Code
+                <Mail className="w-3.5 h-3.5" /> Email Verification OTP
               </button>
             </div>
 
-            {/* TAB CONTENT METHOD 1: TRADITIONAL OLD PASSWORD CHANGE ROUTINE */}
-            {activeTab === 'password' && (
-              <form onSubmit={handlePasswordSubmit} className="space-y-4 pt-2">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Current Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                      placeholder="••••••••"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">New Password Variant</label>
-                    <input
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                      placeholder="Min 6 characters"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Confirm New Password</label>
-                    <input
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                      placeholder="••••••••"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    type="submit"
-                    disabled={actionLoading}
-                    className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow-sm transition-all"
-                  >
-                    Change Account Password
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* TAB CONTENT METHOD 2: MODERN EMAIL OTP KEY DISPATCH OVERRIDE */}
-            {activeTab === 'otp' && (
-              <div className="space-y-4 pt-2">
-                {!otpSent ? (
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="space-y-1 flex-1">
-                      <p className="text-xs font-bold text-slate-800">Dispatch Dynamic Access Verification OTP</p>
-                      <input 
-                        type="email"
-                        // value={"sfeel414@gmail.com"}
-                        value={otpData.emailInput}
-                        onChange={(e) => setOtpData({ ...otpData, emailInput: e.target.value })}
-                        placeholder="Enter your email address (e.g., admin@construction.com)"
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500 mt-1"
+            <AnimatePresence mode="wait">
+              {/* CONTENT METHOD 1: TRADITIONAL KEY ROTATION */}
+              {activeTab === 'password' && (
+                <motion.form 
+                  key="password-tab"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  onSubmit={handlePasswordSubmit} 
+                  className="space-y-4 pt-2"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Current Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                        placeholder="••••••••"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-orange-500 focus:bg-white transition-all"
+                        required
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleRequestOtp}
-                      disabled={actionLoading}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs whitespace-nowrap self-end sm:self-center"
-                    >
-                      Send OTP Code
-                    </button>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">New Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                        placeholder="Min 6 characters"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-orange-500 focus:bg-white transition-all"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Confirm New Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                        placeholder="••••••••"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-orange-500 focus:bg-white transition-all"
+                        required
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <form onSubmit={handleOtpVerifyAndSubmit} className="space-y-4 border border-dashed border-indigo-200 p-4 rounded-xl bg-indigo-50/20">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-[10px] font-bold text-indigo-600 uppercase mb-1 tracking-wider">Enter 6-Digit OTP</label>
-                        <input
-                          type="text"
-                          maxLength="6"
-                          value={otpData.otpCode}
-                          onChange={(e) => setOtpData({ ...otpData, otpCode: e.target.value })}
-                          placeholder="e.g. 749201"
-                          className="w-full bg-white border border-indigo-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-indigo-900 outline-none text-center tracking-widest"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">New Password Variant</label>
-                        <input
-                          type="password"
-                          value={otpData.newPassword}
-                          onChange={(e) => setOtpData({ ...otpData, newPassword: e.target.value })}
-                          placeholder="••••••••"
-                          className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wider">Confirm Password</label>
-                        <input
-                          type="password"
-                          value={otpData.confirmPassword}
-                          onChange={(e) => setOtpData({ ...otpData, confirmPassword: e.target.value })}
-                          placeholder="••••••••"
-                          className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-indigo-500"
-                          required
-                        />
-                      </div>
-                    </div>
 
-                    <div className="flex justify-between items-center pt-2 gap-4">
-                      <button 
-                        type="button" 
-                        onClick={() => setOtpSent(false)} 
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline"
-                      >
-                        Change Email Address / Resend
-                      </button>
-                      
-                      <button
-                        type="submit"
+                  <div className="flex justify-end pt-1">
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={actionLoading}
+                      className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-sm transition-colors"
+                    >
+                      Update Account Passphrase
+                    </motion.button>
+                  </div>
+                </motion.form>
+              )}
+
+              {/* CONTENT METHOD 2: MODERN EMAIL OTP DISPATCH */}
+              {activeTab === 'otp' && (
+                <motion.div 
+                  key="otp-tab"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-4 pt-2"
+                >
+                  {!otpSent ? (
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="space-y-1 flex-1">
+                        <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                          <Mail className="w-3.5 h-3.5 text-slate-400" /> Dispatch Dynamic Access Verification OTP
+                        </p>
+                        <input 
+                          type="email"
+                          value={otpData.emailInput}
+                          onChange={(e) => setOtpData({ ...otpData, emailInput: e.target.value })}
+                          placeholder="Enter your email address"
+                          className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-orange-500 mt-1 transition-all"
+                        />
+                      </div>
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        type="button"
+                        onClick={handleRequestOtp}
                         disabled={actionLoading}
-                        className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow-sm transition-all"
+                        className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs whitespace-nowrap self-stretch sm:self-end h-10 flex items-center justify-center transition-colors"
                       >
-                        Confirm OTP & Save Password
-                      </button>
+                        Send OTP Code
+                      </motion.button>
                     </div>
-                  </form>
-                )}
-              </div>
-            )}
+                  ) : (
+                    <form onSubmit={handleOtpVerifyAndSubmit} className="space-y-4 border border-dashed border-orange-200 p-4 rounded-xl bg-orange-50/10">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-[10px] font-bold text-orange-600 uppercase mb-1.5 tracking-wider flex items-center gap-1">
+                            <LockOpen className="w-3 h-3" /> Enter 6-Digit OTP
+                          </label>
+                          <input
+                            type="text"
+                            maxLength="6"
+                            value={otpData.otpCode}
+                            onChange={(e) => setOtpData({ ...otpData, otpCode: e.target.value })}
+                            placeholder="e.g. 749201"
+                            className="w-full bg-white border border-orange-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold text-orange-700 outline-none text-center tracking-widest focus:border-orange-500 transition-all"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">New Password</label>
+                          <input
+                            type="password"
+                            value={otpData.newPassword}
+                            onChange={(e) => setOtpData({ ...otpData, newPassword: e.target.value })}
+                            placeholder="••••••••"
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-orange-500 transition-all"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-wider">Confirm Password</label>
+                          <input
+                            type="password"
+                            value={otpData.confirmPassword}
+                            onChange={(e) => setOtpData({ ...otpData, confirmPassword: e.target.value })}
+                            placeholder="••••••••"
+                            className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-800 outline-none focus:border-orange-500 transition-all"
+                            required
+                          />
+                        </div>
+                      </div>
 
+                      <div className="flex flex-col sm:flex-row justify-between items-center pt-1 gap-3">
+                        <button 
+                          type="button" 
+                          onClick={() => setOtpSent(false)} 
+                          className="text-xs font-bold text-orange-500 hover:text-orange-600 underline transition-colors self-start sm:self-center"
+                        >
+                          Change Email Address / Resend
+                        </button>
+                        
+                        <motion.button
+                          whileTap={{ scale: 0.98 }}
+                          type="submit"
+                          disabled={actionLoading}
+                          className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-sm transition-colors"
+                        >
+                          Confirm OTP & Save Password
+                        </motion.button>
+                      </div>
+                    </form>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
         </div>

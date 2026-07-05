@@ -1,10 +1,26 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+// Import required sleek vector icons from lucide-react
+import {
+  CalendarDays,
+  Building2,
+  Users,
+  CheckCircle2,
+  AlertCircle,
+  XCircle,
+  Zap,
+  Save,
+  BarChart3,
+  CalendarDays as MonthIcon,
+  Clock,
+  Gauge
+} from "lucide-react";
+
 export default function Attendance() {
   const baseURL = import.meta.env.VITE_BACKEND_URL;
-
 
   // Core Database States
   const [workers, setWorkers] = useState([]);
@@ -166,7 +182,7 @@ export default function Attendance() {
     fetchExistingAttendanceLog();
   }, [selectedDate, selectedSiteId, workers]);
 
-  // 🚀 3. FIXED: Extracted monthly report generation engine to be standalone and reusable
+  // 3. Standalone Report Generator Method
   const generateMonthlyAnalyticsReport = async () => {
     if (workers.length === 0) return;
     setReportLoading(true);
@@ -230,7 +246,6 @@ export default function Attendance() {
     }
   };
 
-  // Re-trigger calculation automatically whenever month or target workers array shifts
   useEffect(() => {
     generateMonthlyAnalyticsReport();
   }, [reportMonth, workers]);
@@ -309,13 +324,23 @@ export default function Attendance() {
 
     try {
       await attendancePromise;
-      // 🚀 FIXED: Calling the freshly extracted module method now executes perfectly!
       generateMonthlyAnalyticsReport();
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Motion layout presets
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 110, damping: 15 } }
   };
 
   if (pageLoading) {
@@ -327,13 +352,14 @@ export default function Attendance() {
   }
 
   return (
-    <div className="space-y-10 max-w-7xl mx-auto p-2">
+    <div className="space-y-10 max-w-7xl mx-auto p-2 font-sans overflow-x-hidden">
+      
       {/* SECTION 1: ATTENDANCE ENTRY MODULE */}
       <div className="space-y-6">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h3 className="text-xl md:text-2xl font-bold text-slate-800">
-              Daily Attendance Log
+            <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <CalendarDays className="w-6 h-6 text-orange-500" /> Daily Attendance Log
             </h3>
             <p className="text-xs md:text-sm text-slate-500">
               Track and manage daily on-site workforce roll logs securely.
@@ -341,14 +367,12 @@ export default function Attendance() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-            <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex-1 sm:flex-initial">
-              <label className="text-[10px] font-bold text-slate-400 uppercase px-1">
-                Site
-              </label>
+            <div className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex-1 sm:flex-initial">
+              <Building2 className="w-4 h-4 text-slate-400 shrink-0 ml-1" />
               <select
                 value={selectedSiteId}
                 onChange={(e) => setSelectedSiteId(e.target.value)}
-                className="border-0 bg-transparent text-xs font-bold text-slate-800 outline-none focus:ring-0 max-w-[180px]"
+                className="border-0 bg-transparent text-xs font-bold text-slate-800 outline-none focus:ring-0 cursor-pointer min-w-[140px] max-w-[200px]"
               >
                 {sites.map((s) => (
                   <option key={s._id} value={s._id}>
@@ -358,10 +382,8 @@ export default function Attendance() {
               </select>
             </div>
 
-            <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex-1 sm:flex-initial">
-              <label className="text-[10px] font-bold text-slate-400 uppercase px-1">
-                Date
-              </label>
+            <div className="flex items-center gap-2 bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex-1 sm:flex-initial">
+              <CalendarDays className="w-4 h-4 text-slate-400 shrink-0 ml-1" />
               <input
                 type="date"
                 max={getTodayDateString()}
@@ -374,142 +396,136 @@ export default function Attendance() {
         </div>
 
         {/* Dynamic Summary Counters widgets with RAPID-MARK MACRO BUTTONS */}
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Total Workforce
-                </p>
-                <p className="text-lg md:text-xl font-bold text-slate-900 mt-0.5">
-                  {workers.length}
-                </p>
-              </div>
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        >
+          <motion.div variants={itemVariants} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between min-h-[110px]">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Users className="w-3.5 h-3.5" /> Total Workforce
+              </p>
+              <p className="text-2xl font-black text-slate-900 mt-1">
+                {workers.length}
+              </p>
             </div>
-            <div className="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 shadow-sm flex flex-col justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
-                  Present
-                </p>
-                <p className="text-lg md:text-xl font-bold text-emerald-800 mt-0.5">
-                  {getSummaryCount("Present")}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleBulkRapidMark("Present")}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase py-1.5 rounded-lg transition-all shadow-xs"
-              >
-                ⚡ Mark All
-              </button>
+          </motion.div>
+          
+          <motion.div variants={itemVariants} className="bg-emerald-50/40 p-4 rounded-2xl border border-emerald-100 shadow-sm flex flex-col justify-between gap-3 min-h-[110px]">
+            <div>
+              <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Present
+              </p>
+              <p className="text-2xl font-black text-emerald-800 mt-1">
+                {getSummaryCount("Present")}
+              </p>
             </div>
-            <div className="bg-amber-50/60 p-4 rounded-xl border border-amber-100 shadow-sm flex flex-col justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
-                  Half-Day
-                </p>
-                <p className="text-lg md:text-xl font-bold text-amber-800 mt-0.5">
-                  {getSummaryCount("Half-Day")}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleBulkRapidMark("Half-Day")}
-                className="w-full bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase py-1.5 rounded-lg transition-all shadow-xs"
-              >
-                ⚡ Mark All
-              </button>
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              type="button"
+              onClick={() => handleBulkRapidMark("Present")}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase py-1.5 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1"
+            >
+              <Zap className="w-3 h-3" /> Mark All
+            </motion.button>
+          </motion.div>
+          
+          <motion.div variants={itemVariants} className="bg-amber-50/40 p-4 rounded-2xl border border-amber-100 shadow-sm flex flex-col justify-between gap-3 min-h-[110px]">
+            <div>
+              <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" /> Half-Day
+              </p>
+              <p className="text-2xl font-black text-amber-800 mt-1">
+                {getSummaryCount("Half-Day")}
+              </p>
             </div>
-            <div className="bg-rose-50/60 p-4 rounded-xl border border-rose-100 shadow-sm flex flex-col justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">
-                  Absent
-                </p>
-                <p className="text-lg md:text-xl font-bold text-rose-800 mt-0.5">
-                  {getSummaryCount("Absent")}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleBulkRapidMark("Absent")}
-                className="w-full bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black uppercase py-1.5 rounded-lg transition-all shadow-xs"
-              >
-                ⚡ Mark All
-              </button>
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              type="button"
+              onClick={() => handleBulkRapidMark("Half-Day")}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold uppercase py-1.5 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1"
+            >
+              <Zap className="w-3 h-3" /> Mark All
+            </motion.button>
+          </motion.div>
+          
+          <motion.div variants={itemVariants} className="bg-rose-50/40 p-4 rounded-2xl border border-rose-100 shadow-sm flex flex-col justify-between gap-3 min-h-[110px]">
+            <div>
+              <p className="text-[10px] font-bold text-rose-600 uppercase tracking-wider flex items-center gap-1">
+                <XCircle className="w-3.5 h-3.5" /> Absent
+              </p>
+              <p className="text-2xl font-black text-rose-800 mt-1">
+                {getSummaryCount("Absent")}
+              </p>
             </div>
-          </div>
-        </div>
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              type="button"
+              onClick={() => handleBulkRapidMark("Absent")}
+              className="w-full bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold uppercase py-1.5 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-1"
+            >
+              <Zap className="w-3 h-3" /> Mark All
+            </motion.button>
+          </motion.div>
+        </motion.div>
 
         {/* Main Roster Entry Matrix Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[600px]">
+            <table className="w-full text-left border-collapse min-w-[650px]">
               <thead>
-                <tr className="bg-slate-900 text-white uppercase text-[10px] tracking-wider">
-                  <th className="p-4 w-24">ID</th>
+                <tr className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-800">
+                  <th className="p-4 w-28">Identity ID</th>
                   <th className="p-4">Labour Name</th>
-                  <th className="p-4 w-36">Designation</th>
-                  <th className="p-4 text-center w-80">
-                    Attendance Status Selection
-                  </th>
+                  <th className="p-4 w-40">Designation</th>
+                  <th className="p-4 text-center w-80">Attendance Status Selection</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
+              <tbody className="divide-y divide-slate-100 text-xs sm:text-sm font-medium text-slate-700">
                 {workers.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="4"
-                      className="p-8 text-center text-xs text-slate-400 font-medium"
-                    >
-                      No registered workers found.
+                    <td colSpan="4" className="p-8 text-center text-xs text-slate-400 font-bold">
+                      No registered workers found inside the database roster.
                     </td>
                   </tr>
                 ) : (
                   workers.map((worker) => {
-                    const currentStatus =
-                      attendanceRecords[worker._id] || "Absent";
+                    const currentStatus = attendanceRecords[worker._id] || "Absent";
                     return (
-                      <tr
-                        key={worker._id}
-                        className="hover:bg-slate-50/50 transition-colors"
-                      >
-                        <td className="p-4 text-slate-400 font-mono text-xs">
+                      <tr key={worker._id} className="hover:bg-slate-50/60 transition-colors">
+                        <td className="p-4 text-slate-400 font-mono font-bold text-xs">
                           {worker.identityId}
                         </td>
-                        <td className="p-4 font-semibold text-slate-900">
+                        <td className="p-4 font-black text-slate-900">
                           {worker.name}
                         </td>
                         <td className="p-4">
-                          <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs capitalize">
+                          <span className="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide">
                             {worker.role || "Labour"}
                           </span>
                         </td>
                         <td className="p-4">
-                          <div className="flex justify-center items-center gap-1.5 max-w-xs mx-auto">
+                          <div className="flex justify-center items-center gap-1.5 max-w-xs mx-auto bg-slate-100 p-1 rounded-xl border border-slate-200/30">
                             <button
                               type="button"
-                              onClick={() =>
-                                handleStatusChange(worker._id, "Present")
-                              }
-                              className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all ${currentStatus === "Present" ? "bg-emerald-600 text-white shadow-sm" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
+                              onClick={() => handleStatusChange(worker._id, "Present")}
+                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-black transition-all ${currentStatus === "Present" ? "bg-emerald-600 text-white shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
                             >
                               Present
                             </button>
                             <button
                               type="button"
-                              onClick={() =>
-                                handleStatusChange(worker._id, "Half-Day")
-                              }
-                              className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all ${currentStatus === "Half-Day" ? "bg-amber-500 text-white shadow-sm" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
+                              onClick={() => handleStatusChange(worker._id, "Half-Day")}
+                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-black transition-all ${currentStatus === "Half-Day" ? "bg-amber-500 text-white shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
                             >
                               Half-Day
                             </button>
                             <button
                               type="button"
-                              onClick={() =>
-                                handleStatusChange(worker._id, "Absent")
-                              }
-                              className={`flex-1 py-1 px-2.5 rounded-lg text-xs font-bold transition-all ${currentStatus === "Absent" ? "bg-rose-500 text-white shadow-sm" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
+                              onClick={() => handleStatusChange(worker._id, "Absent")}
+                              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-black transition-all ${currentStatus === "Absent" ? "bg-rose-500 text-white shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
                             >
                               Absent
                             </button>
@@ -524,32 +540,34 @@ export default function Attendance() {
           </div>
         </div>
 
-        <div className="flex justify-end pt-2">
-          <button
+        <div className="flex justify-end pt-1">
+          <motion.button
+            whileTap={{ scale: 0.98 }}
             onClick={handleSaveAttendance}
             disabled={saveLoading || workers.length === 0}
-            className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 disabled:bg-slate-300 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-md transition-all disabled:cursor-not-allowed"
+            className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 disabled:bg-slate-200 text-white font-bold px-6 py-3.5 rounded-xl text-xs sm:text-sm shadow-md transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
+            <Save className="w-4 h-4" />
             {saveLoading ? "Saving Ledger Logs..." : "Save Log Calculations"}
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      {/* SECTION 2: COMPREHENSIVE HISTORICAL REPORTS ENGINE WITH PRESENT MATRIX CALCULATIONS */}
+      {/* SECTION 2: COMPREHENSIVE HISTORICAL REPORTS ENGINE */}
       <div className="pt-6 border-t border-slate-200 space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h4 className="text-xl font-bold text-slate-900">
-              Workforce Cumulative Analytics Report
+            <h4 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-slate-500" /> Workforce Cumulative Analytics Report
             </h4>
             <p className="text-xs text-slate-500">
-              Review aggregated frequency allocations, weighted parameters, and
-              fulfillment analytics.
+              Review aggregated frequency allocations, weighted parameters, and fulfillment analytics.
             </p>
           </div>
 
           {/* Month Input Target Selector */}
-          <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-2 w-full sm:w-auto">
+          <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-2 w-full sm:w-auto">
+            <MonthIcon className="w-4 h-4 text-slate-400 shrink-0 ml-1" />
             <label className="text-[10px] font-bold text-slate-400 uppercase px-1">
               Report Month
             </label>
@@ -567,54 +585,48 @@ export default function Attendance() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr className="bg-slate-100 text-slate-700 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
+                <tr className="bg-slate-950 text-slate-400 uppercase text-[10px] font-bold tracking-wider border-b border-slate-800">
                   <th className="p-4">Labour Name Details</th>
-                  <th className="p-4 text-center text-emerald-600">
-                    Full Present (Days)
-                  </th>
-                  <th className="p-4 text-center text-amber-600">Half-Day (Days)</th>
-                  <th className="p-4 text-center text-rose-600">Absent (Days)</th>
-                  <th className="p-4 text-center text-teal-600 bg-teal-50/20">
-                    Total Present (Days)
-                  </th>
-                  <th className="p-4 text-center text-indigo-600">
-                    Total Hours Worked
-                  </th>
-                  <th className="p-4">Fulfillment Score / Ratio</th>
+                  <th className="p-4 text-center text-emerald-400 w-[120px]">Full Present</th>
+                  <th className="p-4 text-center text-amber-400 w-[120px]">Half-Day</th>
+                  <th className="p-4 text-center text-rose-400 w-[120px]">Absent</th>
+                  <th className="p-4 text-center text-teal-400 bg-slate-900 w-[140px]">Total Days</th>
+                  <th className="p-4 text-center text-indigo-400 w-[140px]">Total Hours</th>
+                  <th className="p-4 w-[220px]">Fulfillment Score</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
+              <tbody className="divide-y divide-slate-100 text-xs sm:text-sm font-medium text-slate-700">
                 {reportLoading ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-xs text-slate-400">
+                    <td colSpan="7" className="p-8 text-center text-xs text-slate-400 font-bold">
                       Compiling monthly structural analytic registers...
                     </td>
                   </tr>
                 ) : compiledReportData.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-xs text-slate-400">
-                      No matching timeline parameters found.
+                    <td colSpan="7" className="p-8 text-center text-xs text-slate-400 font-bold">
+                      No matching timeline parameters found inside the database logs.
                     </td>
                   </tr>
                 ) : (
                   compiledReportData.map((report) => (
-                    <tr key={report._id} className="hover:bg-slate-50/40 transition-colors">
+                    <tr key={report._id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="p-4">
-                        <div className="font-bold text-slate-900">{report.name}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">
+                        <div className="font-black text-slate-900">{report.name}</div>
+                        <div className="text-[10px] text-slate-400 font-mono font-bold mt-0.5">
                           ID: {report.identityId} • <span className="capitalize">{report.role}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-center font-bold text-slate-800 font-mono">{report.present}</td>
-                      <td className="p-4 text-center font-bold text-slate-800 font-mono">{report.halfDay}</td>
-                      <td className="p-4 text-center font-bold text-slate-400 font-mono">{report.absent}</td>
+                      <td className="p-4 text-center font-bold text-slate-800 font-mono text-xs">{report.present}</td>
+                      <td className="p-4 text-center font-bold text-slate-800 font-mono text-xs">{report.halfDay}</td>
+                      <td className="p-4 text-center font-bold text-slate-400 font-mono text-xs">{report.absent}</td>
                       
-                      <td className="p-4 text-center font-black text-teal-700 font-mono bg-teal-50/40">
-                        {report.totalPresentDays} <span className="text-[10px] text-slate-400 font-medium font-sans">Days</span>
+                      <td className="p-4 text-center font-black text-teal-700 font-mono text-xs bg-teal-50/30">
+                        {report.totalPresentDays} <span className="text-[10px] text-slate-400 font-bold font-sans">Days</span>
                       </td>
 
-                      <td className="p-4 text-center font-black text-indigo-600 font-mono bg-indigo-50/30">
-                        {report.totalHours} <span className="text-[10px] text-slate-400 font-semibold">Hrs</span>
+                      <td className="p-4 text-center font-black text-indigo-600 font-mono text-xs bg-indigo-50/20">
+                        <span className="inline-flex items-center gap-0.5"><Clock className="w-3 h-3 text-indigo-400" /> {report.totalHours} <span className="text-[10px] text-slate-400 font-bold ml-0.5">Hrs</span></span>
                       </td>
 
                       {/* Metric Progress Bar indicators */}
@@ -628,7 +640,9 @@ export default function Attendance() {
                               style={{ width: `${report.percentage}%` }}
                             />
                           </div>
-                          <span className="font-mono font-bold text-xs text-slate-900 whitespace-nowrap">{report.percentage}%</span>
+                          <span className="font-mono font-black text-xs text-slate-900 whitespace-nowrap flex items-center gap-0.5">
+                            <Gauge className="w-3 h-3 text-slate-400" /> {report.percentage}%
+                          </span>
                         </div>
                       </td>
                     </tr>

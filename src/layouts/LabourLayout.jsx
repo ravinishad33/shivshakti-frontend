@@ -13,7 +13,7 @@ import {
   HandCoins,
   HardHat,
   LogOut,
-  Settings // 🆕 Added settings icon configuration
+  Settings, // 🆕 Added settings icon configuration
 } from "lucide-react";
 
 export default function LabourLayout() {
@@ -33,6 +33,11 @@ export default function LabourLayout() {
 
   const handleLabourLogout = () => {
     setExitLoading(true);
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userName");
+
     setTimeout(() => {
       logout();
       navigate("/");
@@ -95,7 +100,6 @@ export default function LabourLayout() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex font-sans text-slate-100 antialiased overflow-x-hidden">
-      
       {/* 🔮 SIDEBAR NAVIGATION (Hidden on mobile, locks on Desktop md+) */}
       <aside className="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 p-5 justify-between shrink-0 h-screen sticky top-0 z-50">
         <div className="space-y-6">
@@ -128,7 +132,9 @@ export default function LabourLayout() {
                       : "text-slate-400 hover:text-white hover:bg-slate-800/40"
                   }`}
                 >
-                  <div className={`${isActive ? 'text-white scale-110' : 'text-slate-500 group-hover:text-slate-300'} transition-all shrink-0`}>
+                  <div
+                    className={`${isActive ? "text-white scale-110" : "text-slate-500 group-hover:text-slate-300"} transition-all shrink-0`}
+                  >
                     {item.icon}
                   </div>
                   <span>{item.label}</span>
@@ -154,7 +160,7 @@ export default function LabourLayout() {
             )}
             <div className="truncate flex-1 min-w-0">
               <p className="text-xs font-black text-white truncate">
-                Namaste, {getFirstName(profile?.name || "" )}
+                Namaste, {getFirstName(profile?.name || "")}
               </p>
               <p className="text-[9px] font-mono font-bold text-slate-500 mt-0.5 tracking-wider truncate">
                 {profile?.identityId || "N/A"}
@@ -223,7 +229,9 @@ export default function LabourLayout() {
                       : "text-slate-500 font-medium hover:text-slate-300"
                   }`}
                 >
-                  <div className={`transition-transform ${isActive ? "text-orange-500 scale-110" : "text-slate-500 group-hover:text-slate-300"}`}>
+                  <div
+                    className={`transition-transform ${isActive ? "text-orange-500 scale-110" : "text-slate-500 group-hover:text-slate-300"}`}
+                  >
                     {item.icon}
                   </div>
                   <span className="text-[9px] tracking-wide mt-1 font-bold uppercase whitespace-nowrap">

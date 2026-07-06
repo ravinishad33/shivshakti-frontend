@@ -49,8 +49,8 @@ export default function Home() {
         {/* Desktop Controls */}
         <div className="hidden md:flex items-center gap-4">
           <button 
-            onClick={() => navigate('/auth')}
-            className="text-xs font-bold text-slate-600 hover:text-orange-500 transition-colors"
+            onClick={() => navigate('/login')}
+            className="text-xs font-bold text-slate-600 hover:text-orange-500 transition-colors cursor-pointer"
           >
             Portal Access Login →
           </button>
